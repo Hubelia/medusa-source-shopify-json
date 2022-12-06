@@ -2,7 +2,6 @@ import { DataType } from "@shopify/shopify-api";
 import { BaseService } from "medusa-interfaces";
 import { createClient } from "../utils/create-client";
 import { pager } from "../utils/pager";
-
 class ShopifyClientService extends BaseService {
   // eslint-disable-next-line no-empty-pattern
   constructor({}, options) {
@@ -13,7 +12,7 @@ class ShopifyClientService extends BaseService {
     /** @private @const {ShopifyRestClient} */
     this.client_ = this.options?.json ? null : createClient(this.options);
   }
-  get(params) {
+  async get(params) {
     return this.client_.get(params);
   }
 
@@ -29,7 +28,7 @@ class ShopifyClientService extends BaseService {
     return this.client_.post({
       path: params.path,
       body: params.body,
-      type: DataType.JSON
+      type: DataType.JSON,
     });
   }
 

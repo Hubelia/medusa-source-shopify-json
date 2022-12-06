@@ -14,7 +14,7 @@ class ShopifyProductService extends BaseService {
       productVariantService,
       shippingProfileService,
       shopifyClientService,
-      shopifyRedisService
+      shopifyRedisService,
     },
     options
   ) {
@@ -48,7 +48,7 @@ class ShopifyProductService extends BaseService {
       productVariantService: this.productVariantService_,
       productService: this.productService_,
       shopifyClientService: this.shopify_,
-      shopifyRedisService: this.redis_
+      shopifyRedisService: this.redis_,
     });
 
     cloned.transactionManager_ = transactionManager;
@@ -73,7 +73,7 @@ class ShopifyProductService extends BaseService {
       const existingProduct = await this.productService_
         .withTransaction(manager)
         .retrieveByExternalId(data.id, {
-          relations: ["variants", "options"]
+          relations: ["variants", "options"],
         })
         .catch((_) => undefined);
 
@@ -167,7 +167,7 @@ class ShopifyProductService extends BaseService {
 
   async shopifyProductUpdate(id, fields) {
     const product = await this.productService_.retrieve(id, {
-      relations: ["tags", "type"]
+      relations: ["tags", "type"],
     });
 
     // Event was not emitted by update
@@ -177,8 +177,8 @@ class ShopifyProductService extends BaseService {
 
     const update = {
       product: {
-        id: product.external_id
-      }
+        id: product.external_id,
+      },
     };
 
     if (fields.includes("title")) {
@@ -208,8 +208,8 @@ class ShopifyProductService extends BaseService {
         update,
         {
           headers: {
-            "X-Shopify-Access-Token": this.options.password
-          }
+            "X-Shopify-Access-Token": this.options.password,
+          },
         }
       )
       .catch((err) => {
@@ -224,7 +224,7 @@ class ShopifyProductService extends BaseService {
 
   async shopifyVariantUpdate(id, fields) {
     const variant = await this.productVariantService_.retrieve(id, {
-      relations: ["prices", "product"]
+      relations: ["prices", "product"],
     });
 
     // Event was not emitted by update
@@ -234,8 +234,8 @@ class ShopifyProductService extends BaseService {
 
     const update = {
       variant: {
-        id: variant.metadata.sh_id
-      }
+        id: variant.metadata.sh_id,
+      },
     };
 
     if (fields.includes("title")) {
@@ -262,8 +262,8 @@ class ShopifyProductService extends BaseService {
         update,
         {
           headers: {
-            "X-Shopify-Access-Token": this.options.password
-          }
+            "X-Shopify-Access-Token": this.options.password,
+          },
         }
       )
       .catch((err) => {
@@ -287,8 +287,8 @@ class ShopifyProductService extends BaseService {
         `https://${this.options.domain}.myshopify.com/admin/api/2021-10/products/${product.external_id}/variants/${metadata.sh_id}.json`,
         {
           headers: {
-            "X-Shopify-Access-Token": this.options.password
-          }
+            "X-Shopify-Access-Token": this.options.password,
+          },
         }
       )
       .catch((err) => {
@@ -372,7 +372,7 @@ class ShopifyProductService extends BaseService {
   addVariantOptions_(variant, productOptions) {
     const options = productOptions.map((o, i) => ({
       option_id: o.id,
-      ...variant.options[i]
+      ...variant.options[i],
     }));
     variant.options = options;
 
@@ -397,7 +397,7 @@ class ShopifyProductService extends BaseService {
       }
 
       const result = await this.productService_.retrieve(id, {
-        relations: ["variants", "options"]
+        relations: ["variants", "options"],
       });
 
       return result;
@@ -428,7 +428,7 @@ class ShopifyProductService extends BaseService {
       handle: product.handle,
       description: product.body_html,
       product_type: {
-        value: product.product_type
+        value: product.product_type,
       },
       is_giftcard: product.product_type === "Gift Cards",
       options:
@@ -441,10 +441,10 @@ class ShopifyProductService extends BaseService {
       images: product.images.map((img) => img.src) || [],
       thumbnail: product.image?.src || null,
       external_id: product.id,
-      status: "proposed",
+      status: this.options.set_published && product.status === "active"? "published" : "proposed",
       metadata: {
-        vendor: product.vendor
-      }
+        vendor: product.vendor,
+      },
     };
   }
 
@@ -458,7 +458,7 @@ class ShopifyProductService extends BaseService {
       title: option.name,
       values: option.values.map((v) => {
         return { value: v };
-      })
+      }),
     };
   }
 
@@ -485,8 +485,8 @@ class ShopifyProductService extends BaseService {
         variant.option3
       ),
       metadata: {
-        sh_id: variant.id
-      }
+        sh_id: variant.id,
+      },
     };
   }
 
@@ -499,7 +499,7 @@ class ShopifyProductService extends BaseService {
     return presentmentPrices.map((p) => {
       return {
         amount: parsePrice(p.price.amount),
-        currency_code: p.price.currency_code.toLowerCase()
+        currency_code: p.price.currency_code.toLowerCase(),
       };
     });
   }
@@ -515,19 +515,19 @@ class ShopifyProductService extends BaseService {
     const opts = [];
     if (option1) {
       opts.push({
-        value: option1
+        value: option1,
       });
     }
 
     if (option2) {
       opts.push({
-        value: option2
+        value: option2,
       });
     }
 
     if (option3) {
       opts.push({
-        value: option3
+        value: option3,
       });
     }
 
@@ -541,7 +541,7 @@ class ShopifyProductService extends BaseService {
    */
   normalizeTag_(tag) {
     return {
-      value: tag
+      value: tag,
     };
   }
 

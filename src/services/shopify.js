@@ -12,7 +12,7 @@ class ShopifyService extends BaseService {
       storeService,
       shopifyProductService,
       shopifyCollectionService,
-      shopifyClientService
+      shopifyClientService,
     },
     options
   ) {
@@ -47,7 +47,7 @@ class ShopifyService extends BaseService {
       shopifyProductService: this.productService_,
       shopifyCollectionService: this.collectionService_,
       shopifyBuildService: this.buildService_,
-      storeService: this.store_
+      storeService: this.store_,
     });
 
     cloned.transactionManager_ = transactionManager;
@@ -108,7 +108,7 @@ class ShopifyService extends BaseService {
               - ${path.resolve(processPath, json["collects_path"])}
             `,
               {
-                cause: e
+                cause: e,
               }
             );
           }
@@ -150,6 +150,7 @@ class ShopifyService extends BaseService {
 
       const resolvedProducts = await Promise.all(
         products.map(async (product) => {
+          console.log("Creating Product", product.title);
           return await this.productService_
             .withTransaction(manager)
             .create(product);
@@ -179,8 +180,8 @@ class ShopifyService extends BaseService {
 
     const payload = {
       metadata: {
-        source_shopify_bt: new Date().toISOString()
-      }
+        source_shopify_bt: new Date().toISOString(),
+      },
     };
 
     await this.store_.update(payload);
@@ -190,7 +191,7 @@ class ShopifyService extends BaseService {
     }
 
     return {
-      updated_at_min: buildtime
+      updated_at_min: buildtime,
     };
   }
 }

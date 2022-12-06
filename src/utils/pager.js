@@ -1,3 +1,7 @@
+const RateLimiter = require("limiter").RateLimiter;
+
+const limiter = new RateLimiter({ tokensPerInterval: 2, interval: 1000 });
+
 export async function pager(
   client,
   path,
@@ -7,12 +11,14 @@ export async function pager(
   let objects = [];
   let nextPage = null;
   let hasNext = true;
+  let idx = 0;
 
   while (hasNext) {
     const params = {
       path,
-      query: { page_info: nextPage }
+      query: { page_info: nextPage },
     };
+    idx += 1;
 
     if (extraHeaders) {
       Object.assign(params, { extraHeaders: extraHeaders });
@@ -25,6 +31,8 @@ export async function pager(
     if (!params.query.page_info) {
       delete params.query.page_info;
     }
+    await limiter.removeTokens(1);
+    console.log("getting product page", idx);
 
     const response = await client.get(params);
 
